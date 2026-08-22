@@ -5,7 +5,9 @@ import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import * as THREE from "three";
 
-import { CAMERA_VIEWS, GalleryView } from "@/config/gallery";
+import { GalleryView, OVERVIEW_CAMERAS, ROOMS } from "@/config/gallery";
+
+import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 
 type CameraControllerProps = {
   view: GalleryView;
@@ -16,19 +18,68 @@ export default function CameraController({
   view,
   onTransitionComplete,
 }: CameraControllerProps) {
-  const { camera } = useThree();
+  const camera = useThree((state) => state.camera);
+  const invalidate = useThree((state) => state.invalidate);
+  const size = useThree((state) => state.size);
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  /*
+    Work out whether we're on a narrow viewport.
+  */
+  const aspect = size.width / size.height;
+
+  const isNarrowScreen = aspect < 1.2;
+
+  const overviewCamera = isNarrowScreen
+    ? OVERVIEW_CAMERAS.mobile
+    : OVERVIEW_CAMERAS.desktop;
+
+  /*
+    The point the camera is currently looking at.
+  */
   const lookAtTarget = useRef(
     new THREE.Vector3(
-      CAMERA_VIEWS.overview.target.x,
-      CAMERA_VIEWS.overview.target.y,
-      CAMERA_VIEWS.overview.target.z,
+      overviewCamera.target.x,
+      overviewCamera.target.y,
+      overviewCamera.target.z,
     ),
   );
 
   useEffect(() => {
-    const nextView = CAMERA_VIEWS[view];
+    const nextView = view === "overview" ? overviewCamera : ROOMS[view].camera;
 
+    /*
+      If the visitor has requested reduced motion,
+      don't run the cinematic GSAP camera flight.
+
+      Move directly to the destination instead.
+    */
+    if (prefersReducedMotion) {
+      camera.position.set(
+        nextView.position.x,
+        nextView.position.y,
+        nextView.position.z,
+      );
+
+      lookAtTarget.current.set(
+        nextView.target.x,
+        nextView.target.y,
+        nextView.target.z,
+      );
+
+      camera.lookAt(lookAtTarget.current);
+
+      invalidate();
+
+      onTransitionComplete?.();
+
+      return;
+    }
+
+    /*
+      Normal cinematic camera transition.
+    */
     const timeline = gsap.timeline({
       defaults: {
         duration: nextView.duration,
@@ -37,14 +88,26 @@ export default function CameraController({
 
       onUpdate: () => {
         camera.lookAt(lookAtTarget.current);
+
+        /*
+          Canvas uses frameloop="demand",
+          so GSAP must explicitly request a frame.
+        */
+        invalidate();
       },
 
       onComplete: () => {
         camera.lookAt(lookAtTarget.current);
+
+        invalidate();
+
         onTransitionComplete?.();
       },
     });
 
+    /*
+      Animate the camera position.
+    */
     timeline.to(
       camera.position,
       {
@@ -55,6 +118,9 @@ export default function CameraController({
       0,
     );
 
+    /*
+      Animate what the camera looks toward.
+    */
     timeline.to(
       lookAtTarget.current,
       {
@@ -68,7 +134,14 @@ export default function CameraController({
     return () => {
       timeline.kill();
     };
-  }, [view, camera, onTransitionComplete]);
+  }, [
+    view,
+    overviewCamera,
+    camera,
+    invalidate,
+    onTransitionComplete,
+    prefersReducedMotion,
+  ]);
 
   return null;
 }

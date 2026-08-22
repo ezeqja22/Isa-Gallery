@@ -20,20 +20,40 @@ type RoomConfig = {
   camera: CameraViewConfig;
 };
 
-export const OVERVIEW_CAMERA: CameraViewConfig = {
-  position: {
-    x: 7.5,
-    y: 0,
-    z: 15,
+export type ViewportMode = "desktop" | "mobile";
+
+export const OVERVIEW_CAMERAS: Record<ViewportMode, CameraViewConfig> = {
+  desktop: {
+    position: {
+      x: 7.5,
+      y: 0,
+      z: 15,
+    },
+
+    target: {
+      x: 7.5,
+      y: 0,
+      z: 0,
+    },
+
+    duration: 1.6,
   },
 
-  target: {
-    x: 7.5,
-    y: 0,
-    z: 0,
-  },
+  mobile: {
+    position: {
+      x: 7.5,
+      y: 0,
+      z: 22,
+    },
 
-  duration: 1.6,
+    target: {
+      x: 7.5,
+      y: 0,
+      z: 0,
+    },
+
+    duration: 1.6,
+  },
 };
 
 export const ROOMS: Record<RoomView, RoomConfig> = {
@@ -80,10 +100,4 @@ export const ROOMS: Record<RoomView, RoomConfig> = {
       duration: 1.8,
     },
   },
-};
-
-export const CAMERA_VIEWS: Record<GalleryView, CameraViewConfig> = {
-  overview: OVERVIEW_CAMERA,
-  room1: ROOMS.room1.camera,
-  room2: ROOMS.room2.camera,
 };

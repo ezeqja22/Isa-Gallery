@@ -1,16 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import { Preload } from "@react-three/drei";
 
 import Room from "@/components/Room";
 import CameraController from "@/components/CameraController";
+import LoadingScreen from "@/components/LoadingScreen";
 
 import {
   GalleryView,
   RoomView,
   ROOMS,
-  OVERVIEW_CAMERA,
+  OVERVIEW_CAMERAS,
 } from "@/config/gallery";
 
 export default function Home() {
@@ -37,7 +39,6 @@ export default function Home() {
 
   const changeRoom = () => {
     if (isTransitioning) return;
-
     if (view === "overview") return;
 
     const destination: RoomView = view === "room1" ? "room2" : "room1";
@@ -45,16 +46,10 @@ export default function Home() {
     setPendingRoom(destination);
     setIsTransitioning(true);
 
-    // First fly back outside.
     setView("overview");
   };
 
   const handleCameraTransitionComplete = useCallback(() => {
-    /*
-      If we have returned to the overview because
-      the user pressed "Change Room", immediately
-      start flying into the other room.
-    */
     if (view === "overview" && pendingRoom) {
       const destination = pendingRoom;
 
@@ -64,9 +59,6 @@ export default function Home() {
       return;
     }
 
-    /*
-      Otherwise the complete transition is finished.
-    */
     setIsTransitioning(false);
   }, [view, pendingRoom]);
 
@@ -83,6 +75,8 @@ export default function Home() {
         overflow: "hidden",
       }}
     >
+      <LoadingScreen />
+
       {showRoomControls && (
         <div
           style={{
@@ -117,31 +111,40 @@ export default function Home() {
       )}
 
       <Canvas
+        frameloop="demand"
         camera={{
           position: [
-            OVERVIEW_CAMERA.position.x,
-            OVERVIEW_CAMERA.position.y,
-            OVERVIEW_CAMERA.position.z,
+            OVERVIEW_CAMERAS.desktop.position.x,
+            OVERVIEW_CAMERAS.desktop.position.y,
+            OVERVIEW_CAMERAS.desktop.position.z,
           ],
+
           fov: 75,
+
+          near: 0.1,
+          far: 100,
         }}
       >
         <ambientLight intensity={2} />
 
-        <CameraController
-          view={view}
-          onTransitionComplete={handleCameraTransitionComplete}
-        />
+        <Suspense fallback={null}>
+          <CameraController
+            view={view}
+            onTransitionComplete={handleCameraTransitionComplete}
+          />
 
-        <Room
-          position={ROOMS.room1.position}
-          onEnter={canSelectRoom ? () => enterRoom("room1") : undefined}
-        />
+          <Room
+            position={ROOMS.room1.position}
+            onEnter={canSelectRoom ? () => enterRoom("room1") : undefined}
+          />
 
-        <Room
-          position={ROOMS.room2.position}
-          onEnter={canSelectRoom ? () => enterRoom("room2") : undefined}
-        />
+          <Room
+            position={ROOMS.room2.position}
+            onEnter={canSelectRoom ? () => enterRoom("room2") : undefined}
+          />
+
+          <Preload all />
+        </Suspense>
       </Canvas>
     </main>
   );
