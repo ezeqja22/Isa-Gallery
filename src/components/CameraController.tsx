@@ -4,7 +4,11 @@ import { useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 import gsap from "gsap";
 
-export default function CameraController({ room }: { room: number }) {
+type CameraControllerProps = {
+  room: number;
+};
+
+export default function CameraController({ room }: CameraControllerProps) {
   const { camera } = useThree();
 
   useEffect(() => {
