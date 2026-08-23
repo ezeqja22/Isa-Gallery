@@ -10,29 +10,47 @@ import Painting from "@/components/Painting/Painting";
 type RoomProps = {
   position: [number, number, number];
   onEnter?: () => void;
-};
-
-export default function Room({ position, onEnter }: RoomProps) {
-  const [isHovered, setIsHovered] = useState(false);
 
   /*
-    The cursor becomes a pointer only when:
+    Whether this component should render its
+    temporary boxGeometry architecture.
 
-    1. The entrance is currently hovered.
-    2. The room is actually interactive.
-
-    When onEnter becomes undefined after entering a room,
-    useCursor automatically restores the normal cursor.
+    Room 1 will set this to false because its
+    architecture now comes from Blender.
   */
+  showShell?: boolean;
+};
+
+export default function Room({
+  position,
+  onEnter,
+  showShell = true,
+}: RoomProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   useCursor(isHovered && Boolean(onEnter));
 
-  const handlePointerEnter = () => {
+  const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     if (!onEnter) return;
+
+    /*
+      Desktop mouse gets hover feedback.
+
+      Touch devices should not enter a fake
+      hover state.
+    */
+    if (event.pointerType !== "mouse") {
+      return;
+    }
 
     setIsHovered(true);
   };
 
-  const handlePointerLeave = () => {
+  const handlePointerLeave = (event: ThreeEvent<PointerEvent>) => {
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+
     setIsHovered(false);
   };
 
@@ -41,12 +59,6 @@ export default function Room({ position, onEnter }: RoomProps) {
 
     event.stopPropagation();
 
-    /*
-      Reset hover immediately before navigation.
-
-      This prevents the entrance from remaining in a
-      "hovered" state while the camera starts moving.
-    */
     setIsHovered(false);
 
     onEnter();
@@ -54,40 +66,60 @@ export default function Room({ position, onEnter }: RoomProps) {
 
   return (
     <group position={position}>
-      {/* Floor */}
-      <mesh position={[0, -2.5, 0]}>
-        <boxGeometry args={[10, 0.2, 10]} />
-        <meshStandardMaterial color="white" />
-      </mesh>
+      {/*
+        Temporary R3F architecture.
 
-      {/* Back Wall */}
-      <mesh position={[0, 0, -5]}>
-        <boxGeometry args={[10, 5, 0.2]} />
-        <meshStandardMaterial color="lightgray" />
-      </mesh>
+        Room 1 will hide this because its shell
+        now comes from Blender.
 
-      {/* Left Wall */}
-      <mesh position={[-5, 0, 0]}>
-        <boxGeometry args={[0.2, 5, 10]} />
-        <meshStandardMaterial color="lightgray" />
-      </mesh>
+        Room 2 continues using it normally.
+      */}
+      {showShell && (
+        <>
+          {/* Floor */}
+          <mesh position={[0, -2.5, 0]}>
+            <boxGeometry args={[10, 0.2, 10]} />
 
-      {/* Painting */}
+            <meshStandardMaterial color="white" />
+          </mesh>
+
+          {/* Back Wall */}
+          <mesh position={[0, 0, -5]}>
+            <boxGeometry args={[10, 5, 0.2]} />
+
+            <meshStandardMaterial color="lightgray" />
+          </mesh>
+
+          {/* Left Wall */}
+          <mesh position={[-5, 0, 0]}>
+            <boxGeometry args={[0.2, 5, 10]} />
+
+            <meshStandardMaterial color="lightgray" />
+          </mesh>
+
+          {/* Right Wall */}
+          <mesh position={[5, 0, 0]}>
+            <boxGeometry args={[0.2, 5, 10]} />
+
+            <meshStandardMaterial color="lightgray" />
+          </mesh>
+
+          {/* Ceiling */}
+          <mesh position={[0, 2.5, 0]}>
+            <boxGeometry args={[10, 0.2, 10]} />
+
+            <meshStandardMaterial color="white" />
+          </mesh>
+        </>
+      )}
+
+      {/*
+        The painting remains separate from
+        the Blender room for now.
+      */}
       <Painting position={[0, 0, -4.8]} />
 
-      {/* Right Wall */}
-      <mesh position={[5, 0, 0]}>
-        <boxGeometry args={[0.2, 5, 10]} />
-        <meshStandardMaterial color="lightgray" />
-      </mesh>
-
-      {/* Ceiling */}
-      <mesh position={[0, 2.5, 0]}>
-        <boxGeometry args={[10, 0.2, 10]} />
-        <meshStandardMaterial color="white" />
-      </mesh>
-
-      {/* Clickable room entrance */}
+      {/* Room entrance interaction area */}
       {onEnter && (
         <mesh
           position={[0, 0, 5.1]}
