@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useCallback, useState } from "react";
-
 import { Canvas } from "@react-three/fiber";
 import { Preload } from "@react-three/drei";
 
@@ -11,6 +10,7 @@ import CameraController from "@/components/CameraController";
 import LoadingScreen from "@/components/LoadingScreen";
 import WebGLFallback from "@/components/WebGLFallback";
 import WebGLContextMonitor from "@/components/WebGLContextMonitor";
+import * as THREE from "three";
 
 import {
   GalleryView,
@@ -134,8 +134,12 @@ export default function Home() {
 
       <Canvas
         frameloop="demand"
-        shadows
+        shadows="soft"
         fallback={<WebGLFallback />}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.15;
+        }}
         camera={{
           position: [
             OVERVIEW_CAMERAS.desktop.position.x,
@@ -152,23 +156,30 @@ export default function Home() {
           onRestored={handleWebGLContextRestored}
         />
 
-        {/* Softer overall fill light */}
-        <ambientLight intensity={0.45} />
+        {/* Warm interior fill */}
+        <hemisphereLight
+          color="#fff3df"
+          groundColor="#6b5742"
+          intensity={1.25}
+        />
 
-        {/* Sunlight for Room 1 */}
+        {/* Warm sunlight through the skylight */}
         <directionalLight
-          position={[-4, 10, 3]}
-          intensity={2.2}
+          position={[-9, 12, 7]}
+          color="#ffd6a1"
+          intensity={2.1}
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
           shadow-camera-near={0.5}
-          shadow-camera-far={30}
-          shadow-camera-left={-8}
-          shadow-camera-right={8}
-          shadow-camera-top={8}
-          shadow-camera-bottom={-8}
-          shadow-bias={-0.0005}
+          shadow-camera-far={50}
+          shadow-camera-left={-14}
+          shadow-camera-right={14}
+          shadow-camera-top={14}
+          shadow-camera-bottom={-14}
+          shadow-bias={-0.00015}
+          shadow-normalBias={0.025}
+          shadow-radius={4}
         />
 
         <Suspense fallback={null}>
@@ -180,16 +191,18 @@ export default function Home() {
           {/* Blender architecture for Room 1 */}
           <RoomModel position={ROOMS.room1.position} />
 
-          {/* Room 1 interactions/content */}
+          {/* Room 1 interaction layer */}
           <Room
             position={ROOMS.room1.position}
+            dimensions={ROOMS.room1.dimensions}
             showShell={false}
             onEnter={canSelectRoom ? () => enterRoom("room1") : undefined}
           />
 
-          {/* Room 2 still uses the original R3F shell */}
+          {/* Room 2 still uses original R3F geometry */}
           <Room
             position={ROOMS.room2.position}
+            dimensions={ROOMS.room2.dimensions}
             onEnter={canSelectRoom ? () => enterRoom("room2") : undefined}
           />
 

@@ -7,38 +7,49 @@ import * as THREE from "three";
 
 import Painting from "@/components/Painting/Painting";
 
+import type { RoomDimensions } from "@/config/gallery";
+
 type RoomProps = {
   position: [number, number, number];
+
+  dimensions?: RoomDimensions;
+
   onEnter?: () => void;
 
-  /*
-    Whether this component should render its
-    temporary boxGeometry architecture.
-
-    Room 1 will set this to false because its
-    architecture now comes from Blender.
-  */
   showShell?: boolean;
+};
+
+const DEFAULT_DIMENSIONS: RoomDimensions = {
+  width: 10,
+  depth: 10,
+  height: 5,
 };
 
 export default function Room({
   position,
+  dimensions = DEFAULT_DIMENSIONS,
   onEnter,
   showShell = true,
 }: RoomProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const { width, depth, height } = dimensions;
+
+  /*
+    Positions derived from the actual
+    dimensions of the room.
+  */
+  const backWallZ = -depth / 2;
+
+  const entranceZ = depth / 2 + 0.1;
+
+  const paintingZ = backWallZ + 0.2;
 
   useCursor(isHovered && Boolean(onEnter));
 
   const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     if (!onEnter) return;
 
-    /*
-      Desktop mouse gets hover feedback.
-
-      Touch devices should not enter a fake
-      hover state.
-    */
     if (event.pointerType !== "mouse") {
       return;
     }
@@ -66,47 +77,39 @@ export default function Room({
 
   return (
     <group position={position}>
-      {/*
-        Temporary R3F architecture.
-
-        Room 1 will hide this because its shell
-        now comes from Blender.
-
-        Room 2 continues using it normally.
-      */}
       {showShell && (
         <>
           {/* Floor */}
-          <mesh position={[0, -2.5, 0]}>
-            <boxGeometry args={[10, 0.2, 10]} />
+          <mesh position={[0, -height / 2, 0]}>
+            <boxGeometry args={[width, 0.2, depth]} />
 
             <meshStandardMaterial color="white" />
           </mesh>
 
           {/* Back Wall */}
-          <mesh position={[0, 0, -5]}>
-            <boxGeometry args={[10, 5, 0.2]} />
+          <mesh position={[0, 0, backWallZ]}>
+            <boxGeometry args={[width, height, 0.2]} />
 
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Left Wall */}
-          <mesh position={[-5, 0, 0]}>
-            <boxGeometry args={[0.2, 5, 10]} />
+          <mesh position={[-width / 2, 0, 0]}>
+            <boxGeometry args={[0.2, height, depth]} />
 
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Right Wall */}
-          <mesh position={[5, 0, 0]}>
-            <boxGeometry args={[0.2, 5, 10]} />
+          <mesh position={[width / 2, 0, 0]}>
+            <boxGeometry args={[0.2, height, depth]} />
 
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Ceiling */}
-          <mesh position={[0, 2.5, 0]}>
-            <boxGeometry args={[10, 0.2, 10]} />
+          <mesh position={[0, height / 2, 0]}>
+            <boxGeometry args={[width, 0.2, depth]} />
 
             <meshStandardMaterial color="white" />
           </mesh>
@@ -114,20 +117,20 @@ export default function Room({
       )}
 
       {/*
-        The painting remains separate from
-        the Blender room for now.
+        Painting automatically sits
+        near the room's actual back wall.
       */}
-      <Painting position={[0, 0, -4.8]} />
+      <Painting position={[0, 0, paintingZ]} />
 
-      {/* Room entrance interaction area */}
+      {/* Entrance interaction area */}
       {onEnter && (
         <mesh
-          position={[0, 0, 5.1]}
+          position={[0, 0, entranceZ]}
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
           onClick={handleClick}
         >
-          <planeGeometry args={[9.8, 4.8]} />
+          <planeGeometry args={[width - 0.4, height - 0.4]} />
 
           <meshBasicMaterial
             color="white"
