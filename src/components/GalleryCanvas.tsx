@@ -18,7 +18,7 @@ import StaticShadows from "./StaticShadows";
 import WebGLContextMonitor from "./WebGLContextMonitor";
 import SceneErrorBoundary from "./SceneErrorBoundary";
 import type { Artwork } from "@/config/artworks";
-import { GalleryView, ROOMS, OVERVIEW_CAMERAS } from "@/config/gallery";
+import { GalleryView, type RoomView, ROOMS, OVERVIEW_CAMERAS } from "@/config/gallery";
 
 type Props = {
   view: GalleryView;
@@ -33,6 +33,7 @@ type Props = {
   onFatalError: (error: Error) => void;
   onTransitionComplete: () => void;
   onArtworkSelect: (artwork: Artwork) => void;
+  onEnterRoom: (room: RoomView) => void;
   onProgress: (progress: number) => void;
 };
 
@@ -62,7 +63,7 @@ function Room2Ready({ onReady }: { onReady: () => void }) {
 export default function GalleryCanvas({
   view, lowPower, transitioning, inspecting, loadRoom2, room2Ready,
   onCoreReady, onRoom2Ready, onRoom2Error, onFatalError,
-  onTransitionComplete, onArtworkSelect, onProgress,
+  onTransitionComplete, onArtworkSelect, onEnterRoom, onProgress,
 }: Props) {
   const canSelectRoom = view === "overview" && !transitioning;
   const canLook = view !== "overview" && !transitioning && !inspecting;
@@ -119,7 +120,7 @@ export default function GalleryCanvas({
               position={ROOMS.room1.position}
               dimensions={ROOMS.room1.dimensions}
               showShell={false}
-              onEnter={canSelectRoom ? () => undefined : undefined}
+              onEnter={canSelectRoom ? () => onEnterRoom("room1") : undefined}
             />
             <CameraController view={view} onTransitionComplete={onTransitionComplete} />
             <RoomLookControls enabled={canLook} freeYaw={view === "room2"} />
@@ -136,6 +137,7 @@ export default function GalleryCanvas({
                   position={ROOMS.room2.position}
                   dimensions={ROOMS.room2.dimensions}
                   showShell={false}
+                  onEnter={canSelectRoom ? () => onEnterRoom("room2") : undefined}
                 />
                 <Room2Ready onReady={onRoom2Ready} />
               </Suspense>
