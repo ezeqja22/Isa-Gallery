@@ -1,0 +1,8 @@
+const fs=require('fs');
+const edit=(p,f)=>fs.writeFileSync(p,f(fs.readFileSync(p,'utf8')));
+edit('src/components/ExperienceShell.tsx',s=>s.replace('import { useProgress }','import AmbientSound from "./AmbientSound";\nimport { useProgress }').replace('<div className="header-actions">','<div className="header-actions"><AmbientSound walking={transitioning} />'));
+edit('src/components/CameraController.tsx',s=>s.replace('duration: nextView.duration,','duration: fromView === "overview" || view === "overview" ? 5.2 : nextView.duration,').replace('duration:3.2','duration:5.2'));
+// Narrow screens need a wider view of the architecture, including the paired sculptures.
+edit('src/components/HallwayModel.tsx',s=>s.replace('useThree }','useThree }')); 
+edit('src/components/RoomLookControls.tsx',s=>s.replace('const TOUCH_SENSITIVITY = 0.004;','const TOUCH_SENSITIVITY = 0.005;').replace('event.preventDefault();\n\n      dragging.current = true;','if (pointerId.current !== null) return;\n      event.preventDefault();\n\n      dragging.current = true;'));
+edit('scripts/build_hallway.py',s=>s.replace("for x in [-4.83,4.83]:","for x in [-4.83,4.83]:").replace("(.13,14,h)","(.13,13.65,h)").replace("for y in [-21.9,-17.5,-13.1]:","for y in [-21.7,-17.5,-13.3]:").replace("(-4.82,yy,-.3)","(-4.76,yy,-.3)").replace("(-4.82,y,z)","(-4.76,y,z)").replace("for y in [-21,-16]:","for y in [-21.7,-17.5]:").replace("o.scale=(.8,1.35,1)","o.scale=(.8,1.15,1)").replace("(x,-12.9,-.93)","(x,-12.9,-1.02)").replace("(5,-17.5,-2.35),(.25,5,3)","(5,-17.5,-2.37),(.25,5,2.94)").replace("(5,-17.5,3),(.25,5,1)","(5,-17.5,3.0),(.25,5,1.0)"));

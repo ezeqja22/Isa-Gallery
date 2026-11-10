@@ -24,3 +24,163 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* STILL — a warm, editorial frame for the visit. */
+:root { --ink: #191b17; --paper: #e8e0cf; --gold: #b89b67; }
+body { background: var(--ink); color: var(--paper); }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible { outline: 2px solid #d8bd83; outline-offset: 7px; }
+.experience { font-family: Arial, Helvetica, sans-serif; color: var(--paper); }
+.experience button { cursor: pointer; }
+.experience button:disabled { cursor: default; }
+.invitation { position: absolute; inset: 0; z-index: 20; overflow: hidden; background: #191b17; opacity: 1; transition: opacity 1.15s ease, visibility 1.15s; }
+.invitation--departed { opacity: 0; visibility: hidden; pointer-events: none; }
+.invitation:before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 25% 50%, #36372a55, transparent 60%); }
+.experience-header { position: absolute; z-index: 30; left: 0; right: 0; top: 0; padding: 30px 4.5vw; display: flex; align-items: center; justify-content: space-between; pointer-events: none; background: linear-gradient(#10130f80, transparent); }
+.experience-header button { pointer-events: auto; }
+.wordmark { background: none; border: 0; text-align: left; color: #efe7d6; font-family: Georgia, serif; font-size: 32px; letter-spacing: .16em; line-height: 1; }
+.wordmark span { display: block; font-family: Arial, sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: .2em; margin-top: 10px; color: #c2bba9; }
+.header-actions { display: flex; gap: 42px; align-items: center; }
+.header-location { font-size: 9px; letter-spacing: .18em; }
+.menu-button { display: inline-flex; align-items: center; gap: 25px; border: 1px solid #dbcfaf55; padding: 12px 20px; min-height: 44px; border-radius: 2px; background: #171b1680; color: #efe7d6; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; transition: background .25s; }
+.menu-button:hover { background: #494936; }
+.menu-button span { font-size: 18px; }
+.invitation-copy { position: absolute; z-index: 2; top: 50%; transform: translateY(-43%); left: 8vw; width: 53%; }
+.eyebrow { display: flex; align-items: center; gap: 16px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #bcaa87; }
+.gold-rule { width: 35px; height: 1px; background: var(--gold); }
+.invitation h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: clamp(60px, 7.6vw, 122px); letter-spacing: -.055em; line-height: .97; margin: 38px 0 27px; }
+.invitation h1 em { font-weight: 400; color: #c8b78c; }
+.invitation-description { font-size: 13px; line-height: 1.9; max-width: 300px; color: #bebcae; }
+.enter-button { display: inline-flex; gap: 22px; align-items: center; background: none; border: 0; color: #eee5d2; margin-top: 30px; padding: 0; text-align: left; font-size: 12px; letter-spacing: .06em; }
+.enter-button small { display: block; color: #aaa792; font-size: 10px; letter-spacing: .04em; margin-top: 8px; }
+.enter-circle { width: 62px; height: 62px; border: 1px solid #c7af7d; border-radius: 50%; display: grid; place-items: center; font-size: 27px; transition: background .3s, transform .3s; }
+.enter-button:hover:not(:disabled) .enter-circle { background: #c7af7d; color: #191b17; transform: rotate(45deg); }
+.enter-button:disabled { opacity: .65; }
+.invitation-art { position: absolute; right: 7vw; top: 18%; bottom: 14%; width: 36%; }
+.art-arch { position: absolute; inset: 0; border-radius: 48% 48% 2px 2px; overflow: hidden; border: 1px solid #b89b6760; background: linear-gradient(#2c261010, #1d241635), url('/paintings/piktura1.jpeg') center / cover; box-shadow: 0 0 0 14px #b89b6708, 0 0 0 15px #b89b6729; animation: art-arrive 2s ease both; }
+.art-arch:after { content: ''; position: absolute; inset: 14px; border: 1px solid #f2dfaa60; border-radius: inherit; }
+.art-caption { position: absolute; bottom: -30px; left: 0; font-size: 8px; letter-spacing: .22em; color: #a9a38f; }
+.art-coordinate { position: absolute; right: -35px; top: 50%; writing-mode: vertical-rl; font-size: 9px; letter-spacing: .2em; color: #b4a582; }
+.invitation-bottom { position: absolute; bottom: 25px; left: 4.5vw; right: 4.5vw; border-top: 1px solid #b89b672e; padding-top: 20px; display: flex; justify-content: space-between; gap: 16px; font-size: 8px; letter-spacing: .16em; color: #a59f8b; }
+.invitation-bottom span:nth-child(2) { font-family: Georgia, serif; font-style: italic; font-size: 13px; letter-spacing: 0; }
+.room-footer { position: absolute; z-index: 25; inset: auto 0 0; display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 65px 4.5vw 28px; background: linear-gradient(transparent, #12150fed); pointer-events: none; animation: interface-arrive .8s ease both; }
+.chapter-name h2 { font: 400 32px Georgia, serif; margin: 10px 0 0; }
+.chapter-name .eyebrow { font-size: 8px; }
+.look-hint { font-size: 10px; line-height: 1.6; color: #c8c4b6; margin-bottom: 6px; text-align: center; }
+.chapter-next { pointer-events: auto; display: flex; gap: 25px; align-items: center; color: #eee5d2; background: #24271e; border: 1px solid #bda77a80; border-radius: 2px; padding: 14px 20px; min-height: 46px; font-size: 11px; transition: background .25s; }
+.chapter-next:hover { background: #414732; }
+.chapter-next:disabled { opacity: .4; }
+.chapter-next span:last-child { font-size: 20px; }
+.loading-thread { position: fixed; inset: auto 0 0; height: 2px; z-index: 1000; background: #b89b6720; }
+.loading-thread span { display: block; height: 100%; background: #b89b67; transition: width .4s; }
+.explore-dialog { position: fixed; inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; padding: 30px 6vw; background: #1b201a; color: #e8e0cf; }
+.explore-dialog::backdrop { background: #10120ff5; }
+.explore-dialog[open] { display: flex; flex-direction: column; animation: interface-arrive .35s ease; }
+.explore-heading { display: flex; justify-content: space-between; align-items: center; }
+.explore-body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 12vw; padding: 40px 3vw; }
+.explore-body h2 { font: 400 clamp(48px, 6vw, 90px) Georgia, serif; letter-spacing: -.04em; line-height: 1.1; margin: 0 0 26px; }
+.explore-body p { color: #b9b8a8; font-size: 14px; line-height: 1.9; max-width: 360px; }
+.explore-body .visit-help { font-size: 11px; margin-top: 28px; color: #999e8b; }
+.explore-body nav { display: grid; }
+.explore-body nav button { position: relative; display: grid; grid-template-columns: 35px 1fr; column-gap: 15px; border: 0; border-top: 1px solid #a392694d; background: transparent; color: #e8e0cf; text-align: left; padding: 28px 25px 28px 0; }
+.explore-body nav button:hover { color: #d8b77b; }
+.explore-body nav button > span { font-size: 10px; color: #a89a79; padding-top: 12px; }
+.explore-body nav strong { font: 400 36px Georgia, serif; }
+.explore-body nav small { grid-column: 2; font-size: 11px; color: #a8ac99; margin-top: 12px; }
+.explore-body nav b { position: absolute; top: 32px; right: 0; font-size: 22px; font-weight: 400; }
+.explore-body nav .return-intro { display: flex; justify-content: space-between; font-size: 11px; align-items: center; }
+.explore-body nav .return-intro span { padding: 0; }
+.explore-foot { font: italic 14px Georgia, serif; border-top: 1px solid #a392694d; padding-top: 20px; color: #aeaa96; }
+.text-button { border: 0; background: none; color: #dbc08b; padding: 12px; text-decoration: underline; }
+@keyframes art-arrive { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes interface-arrive { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 700px) {
+  .experience-header { padding: 22px 24px; }
+  .wordmark { font-size: 26px; }
+  .header-location { display: none; }
+  .menu-button { padding: 9px 14px; gap: 15px; }
+  .invitation-art { right: 9%; width: 56%; top: 19%; bottom: 29%; opacity: .4; }
+  .invitation-art:after { content: ''; position: absolute; inset: -20px; background: linear-gradient(90deg, #191b17cc, transparent); }
+  .invitation-copy { left: 8%; width: 86%; top: 48%; }
+  .invitation h1 { font-size: clamp(52px, 12vw, 82px); margin-top: 28px; }
+  .invitation-description { max-width: 260px; color: #d4d0c1; }
+  .eyebrow { font-size: 8px; }
+  .enter-button { margin-top: 22px; }
+  .enter-circle { height: 52px; width: 52px; }
+  .art-caption, .art-coordinate { display: none; }
+  .invitation-bottom { bottom: 20px; left: 24px; right: 24px; }
+  .invitation-bottom span:nth-child(2) { display: none; }
+  .room-footer { flex-wrap: wrap; align-items: center; padding: 55px 24px 22px; gap: 16px; }
+  .chapter-name h2 { font-size: 25px; }
+  .chapter-next { padding: 10px 12px; gap: 10px; }
+  .look-hint { order: 3; width: 100%; margin: 0; font-size: 9px; }
+  .explore-dialog { padding: 22px 24px; }
+  .explore-body { grid-template-columns: 1fr; gap: 25px; padding: 35px 0; }
+  .explore-body h2 { font-size: 48px; margin-bottom: 15px; }
+  .explore-body p { font-size: 12px; }
+  .explore-body .visit-help { display: none; }
+  .explore-body nav strong { font-size: 30px; }
+  .explore-body nav button { padding-top: 20px; padding-bottom: 20px; }
+}
+@media (max-height: 600px) and (min-width: 701px) { .invitation h1 { font-size: 64px; margin: 18px 0; } .invitation-copy { transform: translateY(-39%); } .enter-button { margin-top: 16px; } .invitation-art { top: 23%; bottom: 19%; } }
+@media (prefers-reduced-motion: reduce) { .experience *, .experience *:before, .experience *:after { animation: none !important; transition-duration: .01ms !important; } }
+.collection-links { margin-top: 30px; display: grid; gap: 12px; max-width: 360px; }
+.collection-links button { border: 0; background: transparent; padding: 5px 0; display: flex; justify-content: space-between; color: #d0c5a9; font: 15px Georgia, serif; text-align: left; }
+.collection-links button:hover { color: #f5dfb2; }
+.inspection-eyebrow { position: absolute; z-index: 10; left: 32px; top: 34px; font-size: 9px; letter-spacing: .2em; color: #bcaa87; pointer-events: none; }
+.artwork-inspector h2 { font-family: Georgia, serif; }
+.inspection-detail { display: block; font-size: 12px; color: #bdaa83; margin-top: 6px; }
+@media (max-width: 700px) { .collection-links { margin-top: 18px; gap: 4px; } .explore-body { align-items: start; } .inspection-eyebrow { left: 20px; top: 32px; font-size: 8px; } }
+.explore-body { padding-top: 24px; padding-bottom: 24px; }
+.explore-body h2 { font-size: clamp(48px, 4.7vw, 76px); }
+.explore-heading, .explore-foot { flex-shrink: 0; }
+.artwork-loading { color: #c8b78c; font: 12px Georgia, serif; white-space: nowrap; }
+@media (max-width: 700px) { .explore-body h2 { font-size: 46px; } }
+/* The welcome is now a live view from inside the entrance hall. */
+.invitation { background: transparent; pointer-events: none; }
+.invitation:before { background: linear-gradient(90deg,#11160fba 0%,#11160f55 43%,transparent 73%); }
+.invitation-copy { pointer-events: auto; left: 5vw; width: 44%; }
+.invitation h1 { font-size: clamp(48px,5.4vw,86px); }
+.invitation-bottom { pointer-events: none; }
+.arrival-card { position:fixed;inset:0;z-index:1500;background:#171b16;color:#e8e0cf;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.1s ease,visibility 1.1s; }
+.arrival-card--ready { opacity:0;visibility:hidden;pointer-events:none; }
+.arrival-card h1 { font:400 clamp(68px,12vw,150px) Georgia,serif;letter-spacing:.18em;margin:28px 0 35px;padding-left:.18em; }
+.arrival-card p { font-size:11px;letter-spacing:.12em;color:#b9af96;margin-top:24px; }
+.arrival-rule { height:1px;width:45px;background:#b89b67; }
+.arrival-progress { height:1px;width:160px;background:#b89b6725;margin-top:20px; }
+.arrival-progress span { display:block;height:100%;background:#b89b67;transition:width .4s; }
+@media(max-width:700px){.invitation-copy{width:88%;left:6%;top:auto;bottom:13%;transform:none}.invitation h1{font-size:48px;margin:20px 0}.invitation:before{background:linear-gradient(0deg,#10150ff2, #10150f65 55%,transparent)}.invitation-description{font-size:12px}.invitation-bottom{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.arrival-card{transition:none}}
+.sound-button { pointer-events:auto; border:1px solid #c8b78c66; background:#171b1680; color:#e8e0cf; padding:12px; min-height:44px; font-size:11px; cursor:pointer; }
+.sound-button:focus-visible { outline:2px solid #e0c38c; outline-offset:3px; }
+@media(max-width:700px) {
+  .experience-header { padding: max(14px,env(safe-area-inset-top)) 16px 10px; }
+  .header-actions { gap:8px; }
+  .wordmark { font-size:22px; }
+  .wordmark span { font-size:6px; }
+  .menu-button { min-height:44px; padding:10px; gap:8px; }
+  .sound-button { padding:9px; font-size:10px; }
+  .invitation-copy { bottom:max(62px,calc(env(safe-area-inset-bottom) + 38px)); }
+  .invitation h1 { font-size:clamp(32px,9vw,44px); margin:12px 0; }
+  .invitation-description { max-width:290px; line-height:1.65; }
+  .invitation .eyebrow { display:none; }
+  .enter-button { margin-top:14px; }
+  .room-footer { padding:30px 16px max(14px,env(safe-area-inset-bottom)); gap:8px; }
+  .chapter-name h2 { font-size:21px; margin:5px 0; }
+  .chapter-next { min-height:44px; font-size:11px; }
+  .look-hint { font-size:10px; }
+  .invitation-bottom { bottom:max(16px,env(safe-area-inset-bottom)); }
+  .explore-dialog { max-height:100dvh; padding-bottom:max(20px,env(safe-area-inset-bottom)); }
+}
+@media(max-height:500px) and (orientation:landscape) {
+  .invitation-copy { width:48%; top:50%; bottom:auto; transform:translateY(-40%); }
+  .invitation h1 { font-size:32px; margin:8px 0; }
+  .invitation-description { font-size:11px; }
+  .invitation .eyebrow,.invitation-bottom,.wordmark span,.look-hint { display:none; }
+  .enter-button { margin-top:10px; }
+  .enter-circle { width:40px; height:40px; }
+  .room-footer { padding-top:18px; }
+}
+.experience-header--inspection { z-index:1200; pointer-events:none; }
+.experience-header--inspection .wordmark,.experience-header--inspection .header-location,.experience-header--inspection .menu-button { visibility:hidden; }
+.experience-header--inspection .sound-button { pointer-events:auto; }

@@ -1,75 +1,14 @@
 "use client";
-
-import { useProgress } from "@react-three/drei";
-
-export default function LoadingScreen() {
-  const { active, progress } = useProgress();
-
-  if (!active) {
-    return null;
-  }
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 1000,
-
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-
-        background: "#111",
-        color: "white",
-
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          width: 220,
-        }}
-      >
-        <div
-          style={{
-            marginBottom: 12,
-            fontSize: 14,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}
-        >
-          Loading gallery
-        </div>
-
-        <div
-          style={{
-            width: "100%",
-            height: 2,
-            background: "rgba(255,255,255,0.2)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: "100%",
-              background: "white",
-              transition: "width 0.15s ease",
-            }}
-          />
-        </div>
-
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 12,
-            opacity: 0.6,
-          }}
-        >
-          {Math.round(progress)}%
-        </div>
-      </div>
-    </div>
-  );
+import { useProgress } from '@react-three/drei';
+import { EXPERIENCE } from '@/config/experience';
+export default function LoadingScreen({ready=false}:{ready?:boolean}){
+ const {progress,errors}=useProgress();
+ const done=ready&&errors.length===0;
+ return <div className={`arrival-card ${done?'arrival-card--ready':''}`} aria-hidden={done} inert={done}>
+ <span className="eyebrow">A HOUSE FOR ART</span><h1>{EXPERIENCE.name}</h1><span className="arrival-rule"/>
+ <p role="status">{errors.length?'The house could not be loaded.':ready?'Opening the doors…':'Preparing the house…'}</p>
+ <div className="arrival-progress" role="progressbar" aria-label="Loading all rooms" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}><span style={{width:`${progress}%`}}/></div>
+ {errors.length>0&&<button onClick={()=>window.location.reload()}>Try again</button>}
+ </div>;
 }
+

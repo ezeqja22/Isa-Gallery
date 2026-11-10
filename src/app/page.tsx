@@ -1,16 +1,28 @@
 "use client";
 
 import { Suspense, useCallback, useState } from "react";
+
 import { Canvas } from "@react-three/fiber";
 import { Preload } from "@react-three/drei";
+import * as THREE from "three";
 
+import HallwayModel, { SceneReady } from "@/components/HallwayModel";
 import Room from "@/components/Room";
 import RoomModel from "@/components/RoomModel";
 import CameraController from "@/components/CameraController";
+import ExperienceShell from "@/components/ExperienceShell";
 import LoadingScreen from "@/components/LoadingScreen";
 import WebGLFallback from "@/components/WebGLFallback";
 import WebGLContextMonitor from "@/components/WebGLContextMonitor";
-import * as THREE from "three";
+import SkyBackground from "@/components/SkyBackground";
+import RoomLookControls from "@/components/RoomLookControls";
+import ArtworkInspector from "@/components/ArtworkInspector";
+import Room2Model from "@/components/Room2Model";
+import StudioLighting from "@/components/StudioLighting";
+import StaticShadows from "@/components/StaticShadows";
+import GalleryLighting from "@/components/GalleryLighting";
+
+import type { Artwork } from "@/config/artworks";
 
 import {
   GalleryView,
@@ -20,52 +32,43 @@ import {
 } from "@/config/gallery";
 
 export default function Home() {
+  const [sceneReady, setSceneReady] = useState(false);
+  const handleSceneReady = useCallback(() => setSceneReady(true), []);
   const [view, setView] = useState<GalleryView>("overview");
-
-  const [pendingRoom, setPendingRoom] = useState<RoomView | null>(null);
 
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const [webGLContextLost, setWebGLContextLost] = useState(false);
 
+  /*
+   * The artwork currently being inspected.
+   *
+   * null = normal gallery mode
+   * Artwork = inspection mode
+   */
+  const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
+
   const enterRoom = (room: RoomView) => {
-    if (isTransitioning) return;
+    if (isTransitioning || view === room) return;
+
+    setSelectedArtwork(null);
 
     setIsTransitioning(true);
     setView(room);
   };
 
   const goBack = () => {
-    if (isTransitioning) return;
+    if (isTransitioning || view === "overview") return;
 
-    setPendingRoom(null);
-    setIsTransitioning(true);
-    setView("overview");
-  };
+    setSelectedArtwork(null);
 
-  const changeRoom = () => {
-    if (isTransitioning) return;
-    if (view === "overview") return;
-
-    const destination: RoomView = view === "room1" ? "room2" : "room1";
-
-    setPendingRoom(destination);
     setIsTransitioning(true);
     setView("overview");
   };
 
   const handleCameraTransitionComplete = useCallback(() => {
-    if (view === "overview" && pendingRoom) {
-      const destination = pendingRoom;
-
-      setPendingRoom(null);
-      setView(destination);
-
-      return;
-    }
-
     setIsTransitioning(false);
-  }, [view, pendingRoom]);
+  }, []);
 
   const handleWebGLContextLost = useCallback(() => {
     setWebGLContextLost(true);
@@ -75,80 +78,96 @@ export default function Home() {
     setWebGLContextLost(false);
   }, []);
 
+  const handleArtworkSelect = (artwork: Artwork) => {
+    /*
+     * Don't allow paintings to open while
+     * the camera is moving.
+     */
+    if (isTransitioning) return;
+
+    setSelectedArtwork(artwork);
+  };
+
+  const closeArtwork = () => {
+    setSelectedArtwork(null);
+  };
+
   const canSelectRoom = view === "overview" && !isTransitioning;
 
-  const showRoomControls = view !== "overview" && !isTransitioning;
+  /*
+   * Hide room navigation while we're
+   * inspecting a painting.
+   */
+  /*
+   * Room-look controls must stop while
+   * the painting inspection UI is open.
+   */
+  const roomLookEnabled =
+    view !== "overview" && !isTransitioning && selectedArtwork === null;
+
+  /*
+   * Paintings should only be clickable
+   * while actually inside Room 1.
+   */
+  const artworkInteractionEnabled =
+    view === "room1" && !isTransitioning && selectedArtwork === null;
 
   return (
     <main
       style={{
         width: "100vw",
-        height: "100vh",
+        height: "100dvh",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      <LoadingScreen />
+      <LoadingScreen ready={sceneReady} />
 
       {webGLContextLost && <WebGLFallback />}
 
-      {showRoomControls && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(16px + env(safe-area-inset-top))",
-            left: "calc(16px + env(safe-area-inset-left))",
-            zIndex: 100,
-            display: "flex",
-            gap: 10,
-            flexWrap: "wrap",
-          }}
-        >
-          <button
-            onClick={changeRoom}
-            style={{
-              minHeight: 44,
-              padding: "10px 18px",
-              border: "none",
-              cursor: "pointer",
-              touchAction: "manipulation",
-            }}
-          >
-            Change Room
-          </button>
+      {/* ==================================================
+          NORMAL ROOM CONTROLS
+          ================================================== */}
 
-          <button
-            onClick={goBack}
-            style={{
-              minHeight: 44,
-              padding: "10px 18px",
-              border: "none",
-              cursor: "pointer",
-              touchAction: "manipulation",
-            }}
-          >
-            Go Back
-          </button>
-        </div>
+      <div inert={!sceneReady}><ExperienceShell view={view} transitioning={isTransitioning} inspecting={selectedArtwork !== null} onEnter={enterRoom} onHome={goBack} onArtwork={handleArtworkSelect} /></div>
+
+      {selectedArtwork && (
+        <ArtworkInspector
+          key={selectedArtwork.id}
+          artwork={selectedArtwork}
+          onClose={closeArtwork}
+        />
       )}
+
+      {/* ==================================================
+          THREE.JS
+          ================================================== */}
 
       <Canvas
         frameloop="demand"
+        dpr={[1, 1.5]}
         shadows="soft"
         fallback={<WebGLFallback />}
-        onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.15;
+        style={{
+          touchAction: "none",
         }}
         camera={{
           position: [
             OVERVIEW_CAMERAS.desktop.position.x,
+
             OVERVIEW_CAMERAS.desktop.position.y,
+
             OVERVIEW_CAMERAS.desktop.position.z,
           ],
+
           fov: 75,
           near: 0.1,
           far: 100,
+        }}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+
+          gl.toneMappingExposure = 1;
         }}
       >
         <WebGLContextMonitor
@@ -156,42 +175,33 @@ export default function Home() {
           onRestored={handleWebGLContextRestored}
         />
 
-        {/* Warm interior fill */}
-        <hemisphereLight
-          color="#fff3df"
-          groundColor="#6b5742"
-          intensity={1.25}
-        />
-
-        {/* Warm sunlight through the skylight */}
-        <directionalLight
-          position={[-9, 12, 7]}
-          color="#ffd6a1"
-          intensity={2.1}
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-near={0.5}
-          shadow-camera-far={50}
-          shadow-camera-left={-14}
-          shadow-camera-right={14}
-          shadow-camera-top={14}
-          shadow-camera-bottom={-14}
-          shadow-bias={-0.00015}
-          shadow-normalBias={0.025}
-          shadow-radius={4}
-        />
+        <GalleryLighting />
+        <SkyBackground visible />
 
         <Suspense fallback={null}>
+          <HallwayModel />
           <CameraController
             view={view}
             onTransitionComplete={handleCameraTransitionComplete}
           />
 
-          {/* Blender architecture for Room 1 */}
-          <RoomModel position={ROOMS.room1.position} />
+          {/* Camera can rotate only in normal room mode */}
+          <RoomLookControls enabled={roomLookEnabled} freeYaw={view === "room2"} />
+          <StudioLighting />
 
-          {/* Room 1 interaction layer */}
+          {/* ==================================================
+              BLENDER ROOM 1
+
+              Paintings become interactive here.
+              ================================================== */}
+
+          <RoomModel
+            position={ROOMS.room1.position}
+            onArtworkSelect={handleArtworkSelect}
+            artworkInteractionEnabled={artworkInteractionEnabled}
+          />
+
+          {/* Room 1 interaction shell */}
           <Room
             position={ROOMS.room1.position}
             dimensions={ROOMS.room1.dimensions}
@@ -199,16 +209,27 @@ export default function Home() {
             onEnter={canSelectRoom ? () => enterRoom("room1") : undefined}
           />
 
-          {/* Room 2 still uses original R3F geometry */}
+          {/* Actual Blender architecture for Room 2 */}
+          <Room2Model position={ROOMS.room2.position} />
+
+          {/* Invisible Room 2 overview interaction area */}
           <Room
             position={ROOMS.room2.position}
             dimensions={ROOMS.room2.dimensions}
+            showShell={false}
             onEnter={canSelectRoom ? () => enterRoom("room2") : undefined}
           />
 
+          <StaticShadows />
           <Preload all />
+          <SceneReady onReady={handleSceneReady} />
         </Suspense>
       </Canvas>
     </main>
   );
 }
+
+
+
+
+

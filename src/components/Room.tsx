@@ -5,17 +5,12 @@ import { ThreeEvent } from "@react-three/fiber";
 import { useCursor } from "@react-three/drei";
 import * as THREE from "three";
 
-import Painting from "@/components/Painting/Painting";
-
 import type { RoomDimensions } from "@/config/gallery";
 
 type RoomProps = {
   position: [number, number, number];
-
   dimensions?: RoomDimensions;
-
   onEnter?: () => void;
-
   showShell?: boolean;
 };
 
@@ -35,32 +30,20 @@ export default function Room({
 
   const { width, depth, height } = dimensions;
 
-  /*
-    Positions derived from the actual
-    dimensions of the room.
-  */
   const backWallZ = -depth / 2;
-
   const entranceZ = depth / 2 + 0.1;
-
-  const paintingZ = backWallZ + 0.2;
 
   useCursor(isHovered && Boolean(onEnter));
 
   const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     if (!onEnter) return;
-
-    if (event.pointerType !== "mouse") {
-      return;
-    }
+    if (event.pointerType !== "mouse") return;
 
     setIsHovered(true);
   };
 
   const handlePointerLeave = (event: ThreeEvent<PointerEvent>) => {
-    if (event.pointerType !== "mouse") {
-      return;
-    }
+    if (event.pointerType !== "mouse") return;
 
     setIsHovered(false);
   };
@@ -71,58 +54,48 @@ export default function Room({
     event.stopPropagation();
 
     setIsHovered(false);
-
     onEnter();
   };
 
   return (
     <group position={position}>
+      {/* Basic R3F room shell.
+          Room 1 disables this because it uses the Blender model. */}
       {showShell && (
         <>
           {/* Floor */}
           <mesh position={[0, -height / 2, 0]}>
             <boxGeometry args={[width, 0.2, depth]} />
-
             <meshStandardMaterial color="white" />
           </mesh>
 
           {/* Back Wall */}
           <mesh position={[0, 0, backWallZ]}>
             <boxGeometry args={[width, height, 0.2]} />
-
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Left Wall */}
           <mesh position={[-width / 2, 0, 0]}>
             <boxGeometry args={[0.2, height, depth]} />
-
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Right Wall */}
           <mesh position={[width / 2, 0, 0]}>
             <boxGeometry args={[0.2, height, depth]} />
-
             <meshStandardMaterial color="lightgray" />
           </mesh>
 
           {/* Ceiling */}
           <mesh position={[0, height / 2, 0]}>
             <boxGeometry args={[width, 0.2, depth]} />
-
             <meshStandardMaterial color="white" />
           </mesh>
         </>
       )}
 
-      {/*
-        Painting automatically sits
-        near the room's actual back wall.
-      */}
-      <Painting position={[0, 0, paintingZ]} />
-
-      {/* Entrance interaction area */}
+      {/* Invisible interaction plane used from overview */}
       {onEnter && (
         <mesh
           position={[0, 0, entranceZ]}

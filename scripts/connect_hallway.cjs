@@ -1,0 +1,10 @@
+const fs=require('fs');
+let p='src/config/gallery.ts',s=fs.readFileSync(p,'utf8');let a=s.indexOf('export const OVERVIEW_CAMERAS'),b=s.indexOf('export const ROOMS',a);s=s.slice(0,a)+`export const OVERVIEW_CAMERAS: Record<ViewportMode, CameraViewConfig> = {
+ desktop: { position: {x:0,y:-.5,z:21}, target:{x:0,y:-.3,z:-7}, duration:3.2 },
+ mobile: { position: {x:0,y:-.5,z:21}, target:{x:0,y:-.3,z:-7}, duration:3.2 },
+};\n\n`+s.slice(b);fs.writeFileSync(p,s);
+p='src/app/page.tsx';s=fs.readFileSync(p,'utf8');s=s.replace('import Room from','import HallwayModel, { SceneReady } from "@/components/HallwayModel";\nimport Room from');s=s.replace('  const [view,','  const [sceneReady, setSceneReady] = useState(false);\n  const handleSceneReady = useCallback(() => setSceneReady(true), []);\n  const [view,');s=s.replace('<LoadingScreen />','<LoadingScreen ready={sceneReady} />');s=s.replace('<Suspense fallback={null}>','<Suspense fallback={null}>\n          <HallwayModel />');s=s.replace('<Preload all />','<Preload all />\n          <SceneReady onReady={handleSceneReady} />');s=s.replace('<SkyBackground visible={view !== "overview"} />','<SkyBackground visible />');fs.writeFileSync(p,s);
+p='src/components/CameraController.tsx';s=fs.readFileSync(p,'utf8');s=s.replace('fromView === "room1" && view === "room2"','(fromView === "room1" || fromView === "overview") && view === "room2"').replace('fromView === "room2" && view === "room1"','fromView === "room2" && (view === "room1" || view === "overview")');s=s.replace('const path = goingUpstairs ? ROOM1_TO_ROOM2_PATH : ROOM2_TO_ROOM1_PATH;',`const path = goingUpstairs
+ ? [...(fromView === "overview" ? [{...ROOMS.room1.camera, duration:3.2}] : []), ...ROOM1_TO_ROOM2_PATH]
+ : [...ROOM2_TO_ROOM1_PATH, ...(view === "overview" ? [{...overviewCamera, duration:3.2}] : [])];`);fs.writeFileSync(p,s);
+p='src/components/ExperienceShell.tsx';s=fs.readFileSync(p,'utf8');s=s.replace(/      <div className="invitation-art"[^\n]*\n/,'');s=s.replace('Enter the gallery','View the gallery');fs.writeFileSync(p,s);
