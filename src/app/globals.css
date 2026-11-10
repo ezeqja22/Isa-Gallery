@@ -184,3 +184,55 @@ button:focus-visible, a:focus-visible { outline: 2px solid #d8bd83; outline-offs
 .experience-header--inspection { z-index:1200; pointer-events:none; }
 .experience-header--inspection .wordmark,.experience-header--inspection .header-location,.experience-header--inspection .menu-button { visibility:hidden; }
 .experience-header--inspection .sound-button { pointer-events:auto; }
+
+
+/* Phase 1: the introduction is independent of any WebGL setup. */
+.gallery-app { position: relative; width: 100vw; height: 100dvh; overflow: hidden; background: #171b16; }
+.gallery-canvas-host { position: absolute; inset: 0; z-index: 0; }
+.gallery-intro-poster {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(90deg, rgba(14,19,14,.5), rgba(14,19,14,.08)),
+    url("/images/hallway-welcome-web.png") center center / cover no-repeat;
+}
+.gallery-app .experience { position: relative; height: 100%; z-index: 20; pointer-events: none; }
+.gallery-app .experience button, .gallery-app .experience dialog, .gallery-app .invitation-copy {
+  pointer-events: auto;
+}
+.gallery-app .experience-header, .gallery-app .room-footer { pointer-events: none; }
+.gallery-static-link { display: block; text-align: left; margin-top: 12px; padding: 8px 0; font-size: 11px; }
+.arrival-card .text-button { font-size: 11px; margin-top: 22px; }
+.gallery-canvas-error {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  padding: 30px; background: #1b201a; color: #e8e0cf; text-align: center;
+}
+.gallery-room-notice {
+  position: absolute; z-index: 100; left: 50%; bottom: max(100px, 16vh);
+  transform: translateX(-50%); max-width: calc(100% - 32px);
+  background: #20261f; border: 1px solid #b89b6775; color: #e8e0cf;
+  padding: 14px 20px; font-size: 12px; text-align: center;
+  box-shadow: 0 8px 36px #0005;
+}
+.gallery-room-notice button { margin-left: 16px; color: #dfc48d; text-decoration: underline; }
+.lightweight-gallery {
+  min-height: 100dvh; width: 100%; overflow-y: auto; background: #191b17;
+  color: #e8e0cf; padding: max(24px, env(safe-area-inset-top)) 5vw 60px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.lightweight-gallery-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.lightweight-gallery-header h1 { font: 400 42px Georgia, serif; letter-spacing: .12em; margin: 12px 0; }
+.lightweight-gallery-intro { max-width: 800px; margin: 60px 0 42px; }
+.lightweight-gallery-intro h2 { font: 400 clamp(36px, 6vw, 70px) Georgia, serif; margin: 16px 0; }
+.lightweight-gallery-intro p { color: #c4c2b4; font-size: 14px; line-height: 1.7; }
+.lightweight-gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 25px; }
+.lightweight-gallery-artwork { padding-bottom: 22px; }
+.lightweight-gallery-artwork img { display: block; aspect-ratio: 4/3; object-fit: contain; background: #272b24; }
+.lightweight-gallery-artwork h3 { font: 400 27px Georgia, serif; margin: 20px 0 10px; }
+.lightweight-gallery-artwork p { color: #bcb9aa; font-size: 13px; line-height: 1.7; }
+.lightweight-gallery-artwork small { color: #c4b18a; }
+@media (max-width: 700px) {
+  .gallery-intro-poster { background-position: 56% center; }
+  .lightweight-gallery-grid { grid-template-columns: 1fr; gap: 35px; }
+  .lightweight-gallery-intro { margin: 45px 0 30px; }
+  .lightweight-gallery-header h1 { font-size: 28px; }
+  .gallery-room-notice { bottom: max(95px, 16vh); font-size: 11px; }
+}
