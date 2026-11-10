@@ -60,6 +60,12 @@ export default function Home() {
 
   const enterRoom = (room: RoomView) => {
     if (isTransitioning || view === room) return;
+    // A failed atelier boundary cannot be retried without remounting the scene.
+    // Offer the lightweight collection instead of leaving a permanent spinner.
+    if (room === "room2" && room2Error) {
+      setStaticMode(true);
+      return;
+    }
     setSelectedArtwork(null);
     setRoom2Error(null);
 
