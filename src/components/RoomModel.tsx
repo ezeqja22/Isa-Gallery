@@ -54,17 +54,6 @@ export default function RoomModel({
    */
   const materialBackups = useRef(new WeakMap<THREE.Material, MaterialBackup>());
 
-  /*
-   * IMPORTANT:
-   *
-   * Clone both the scene AND the materials.
-   *
-   * scene.clone(true) alone still shares the original
-   * materials from useGLTF's cached model.
-   *
-   * Since we're going to change emissive values on hover,
-   * we want completely independent materials.
-   */
   // Only artwork materials need independent copies for hover highlighting.
   // Other meshes share the GLTF cache's immutable materials and geometries.
   const { clonedScene, ownedMaterials } = useMemo(() => {
@@ -73,7 +62,7 @@ export default function RoomModel({
     const belongsToArtwork = (mesh: THREE.Object3D): boolean => {
       let node: THREE.Object3D | null = mesh;
       while (node) {
-        const name = node.name.replace(/\\.\\d{3}$/, "");
+        const name = node.name.replace(/\.\d{3}$/, "");
         if (findArtworkByObjectName(name)) return true;
         for (const artwork of Object.values(ARTWORKS)) {
           for (const registeredName of artwork.objectNames) {
