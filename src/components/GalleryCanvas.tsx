@@ -104,8 +104,8 @@ export default function GalleryCanvas({
           }}
         >
           <WebGLContextMonitor
-            onLost={() => onFatalError(new Error("WebGL context lost"))}
-            onRestored={() => { /* A fresh visit can be started from the fallback. */ }}
+            onLost={() => console.warn("[Gallery] WebGL context lost; awaiting restoration")}
+            onRestored={() => console.info("[Gallery] WebGL context restored")}
           />
           <AssetProgress onProgress={onProgress} />
           <GalleryLighting lowPower={lowPower} />
