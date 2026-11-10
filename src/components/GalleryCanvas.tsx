@@ -44,6 +44,13 @@ function AssetProgress({ onProgress }: { onProgress: (progress: number) => void 
 }
 
 /** Only marks the optional atelier ready after it has mounted and rendered. */
+function WebGLUnavailable({ onError }: { onError: (error: Error) => void }) {
+  useEffect(() => {
+    onError(new Error("WebGL2 renderer could not start"));
+  }, [onError]);
+  return null;
+}
+
 function Room2Ready({ onReady }: { onReady: () => void }) {
   const invalidate = useThree((state) => state.invalidate);
   useEffect(() => {
@@ -81,9 +88,7 @@ export default function GalleryCanvas({
             powerPreference: lowPower ? "low-power" : "high-performance",
             preserveDrawingBuffer: false,
           }}
-          fallback={<div role="alert" className="gallery-canvas-error">
-            The 3D experience is unavailable on this device.
-          </div>}
+          fallback={<WebGLUnavailable onError={onFatalError} />}
           style={{ touchAction: "none" }}
           camera={{
             position: [
