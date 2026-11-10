@@ -83,11 +83,7 @@ export default function GalleryCanvas({
           frameloop="demand"
           dpr={lowPower ? 1 : [1, 1.5]}
           shadows={!lowPower}
-          gl={{
-            antialias: !lowPower,
-            powerPreference: lowPower ? "low-power" : "high-performance",
-            preserveDrawingBuffer: false,
-          }}
+          gl={{ antialias: !lowPower }}
           fallback={<WebGLUnavailable onError={onFatalError} />}
           style={{ touchAction: "none" }}
           camera={{
