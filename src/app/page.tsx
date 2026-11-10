@@ -12,17 +12,6 @@ import type { GalleryView, RoomView } from "@/config/gallery";
 // Do not download/evaluate Three.js, GLTF loaders or create WebGL on the introduction.
 const GalleryCanvas = dynamic(() => import("@/components/GalleryCanvas"), { ssr: false });
 
-function canUseWebGL2(): boolean {
-  try {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
-    gl?.getExtension("WEBGL_lose_context")?.loseContext();
-    return gl !== null;
-  } catch {
-    return false;
-  }
-}
-
 function isConstrainedDevice(): boolean {
   const device = navigator as Navigator & { deviceMemory?: number };
   return window.matchMedia("(pointer: coarse)").matches ||
@@ -49,7 +38,7 @@ export default function Home() {
   const onProgress = useCallback((value: number) => setProgress(value), []);
   const onFatalError = useCallback((error: Error) => {
     console.error("[Gallery] 3D scene failed:", error);
-    setFatalError("The 3D gallery could not be initialized on this device.");
+    setFatalError(error.message || "The 3D gallery could not be initialized.");
   }, []);
   const onRoom2Error = useCallback((error: Error) => {
     console.error("[Gallery] Atelier failed:", error);
@@ -70,10 +59,6 @@ export default function Home() {
     setRoom2Error(null);
 
     if (!sceneRequested) {
-      if (!canUseWebGL2()) {
-        setFatalError("Your device does not support the WebGL2 experience.");
-        return;
-      }
       setLowPower(isConstrainedDevice());
       setPendingRoom(room);
       setRoom2Requested(room === "room2");
@@ -133,8 +118,24 @@ export default function Home() {
     setView("overview");
   };
 
-  if (staticMode || fatalError) {
-    return <LightweightGallery onHome={resetToIntroduction} reason={fatalError ?? undefined} />;
+  if (staticMode) {
+    return <LightweightGallery onHome={resetToIntroduction} />;
+  }
+
+  if (fatalError) {
+    return (
+      <main className="gallery-app gallery-error-view" role="alert">
+        <div className="gallery-error-message">
+          <p className="eyebrow">STILL / GALLERY</p>
+          <h1>We couldn’t open the 3D gallery.</h1>
+          <p className="gallery-error-detail">{fatalError}</p>
+          <div className="gallery-error-actions">
+            <button className="menu-button" onClick={resetToIntroduction}>Return and retry 3D</button>
+            <button className="menu-button" onClick={() => setStaticMode(true)}>View paintings without 3D</button>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   const initialLoading = sceneRequested && view === "overview" &&
