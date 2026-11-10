@@ -1,16 +1,16 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import AmbientSound from "./AmbientSound";
-import { useProgress } from "@react-three/drei";
 import type { GalleryView, RoomView } from "@/config/gallery";
 import { ARTWORKS, type Artwork } from "@/config/artworks";
 import { EXPERIENCE as copy } from "@/config/experience";
 
-export default function ExperienceShell({ view, transitioning, inspecting, onEnter, onHome, onArtwork }: {
+export default function ExperienceShell({ view, transitioning, inspecting, onEnter, onHome, onArtwork, busy = false, onStaticMode }: {
   view: GalleryView; transitioning: boolean; inspecting: boolean;
   onEnter: (room: RoomView) => void; onHome: () => void; onArtwork: (art: Artwork) => void;
+  busy?: boolean; onStaticMode: () => void;
 }) {
-  const { active, progress, errors } = useProgress();
+  const active = busy;
   const [menuOpen, setMenuOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const intro = view === "overview";
@@ -29,10 +29,10 @@ export default function ExperienceShell({ view, transitioning, inspecting, onEnt
         <p className="eyebrow"><span className="gold-rule" />{copy.eyebrow}</p>
         <h1>{copy.title}<br /><em>{copy.titleAccent}</em></h1>
         <p className="invitation-description">{copy.introduction}</p>
-        <button className="enter-button" disabled={active || transitioning || errors.length > 0} onClick={() => onEnter("room1")}>
-          <span className="enter-circle" aria-hidden="true">↗</span><span>{errors.length ? "Unable to load the rooms" : active ? `Preparing your visit · ${Math.round(progress)}%` : "View the gallery"}<small>{active ? "The doors will open shortly" : "An exhibition in two chapters"}</small></span>
+        <button className="enter-button" disabled={active || transitioning} onClick={() => onEnter("room1")}>
+          <span className="enter-circle" aria-hidden="true">↗</span><span>{active ? "Preparing your visit…" : "View the gallery"}<small>{active ? "The doors will open shortly" : "An exhibition in two chapters"}</small></span>
         </button>
-        {errors.length > 0 && <button className="text-button" onClick={() => window.location.reload()}>Try again</button>}
+        <button className="text-button gallery-static-link" onClick={onStaticMode}>View paintings without 3D</button>
       </div>
       <div className="invitation-bottom"><span>PAINTING · SPACE · PROCESS</span><span>A moment away from the everyday.</span><span>GALLERY & ATELIER</span></div>
     </section>
@@ -52,7 +52,7 @@ export default function ExperienceShell({ view, transitioning, inspecting, onEnt
           {Object.values(ARTWORKS).map(art => <button key={art.id} disabled={active} onClick={() => { setMenuOpen(false); onArtwork(art); }}>{art.title}<span aria-hidden="true">↗</span></button>)}
         </div>
       </div>
-        <nav aria-label="Explore the house"><button onClick={() => navigate("room1")} disabled={active}><span>01</span><strong>{copy.galleryTitle}</strong><small>Finished works, a closer look.</small><b aria-hidden="true">↗</b></button><button onClick={() => navigate("room2")} disabled={active}><span>02</span><strong>{copy.studioTitle}</strong><small>The space behind the paintings.</small><b aria-hidden="true">↗</b></button><button className="return-intro" onClick={() => navigate("overview")}>Return to the introduction <span aria-hidden="true">↗</span></button></nav>
+        <nav aria-label="Explore the house"><button onClick={() => navigate("room1")} disabled={active}><span>01</span><strong>{copy.galleryTitle}</strong><small>Finished works, a closer look.</small><b aria-hidden="true">↗</b></button><button onClick={() => navigate("room2")} disabled={active}><span>02</span><strong>{copy.studioTitle}</strong><small>The space behind the paintings.</small><b aria-hidden="true">↗</b></button><button className="return-intro" onClick={() => navigate("overview")}>Return to the introduction <span aria-hidden="true">↗</span></button><button className="return-intro" onClick={() => { setMenuOpen(false); onStaticMode(); }}>View paintings without 3D <span aria-hidden="true">↗</span></button></nav>
       </div><div className="explore-foot">Two rooms. One unfolding story.</div>
     </dialog>
   </div>;

@@ -17,7 +17,7 @@ function ArtworkWash({ x, sideZ }: { x: number; sideZ?: number }) {
 }
 
 /** One sun and one ambient palette for the whole connected building. */
-export default function GalleryLighting() {
+export default function GalleryLighting({ lowPower = false }: { lowPower?: boolean }) {
   const sunTarget = useMemo(() => {
     const target = new THREE.Object3D();
     target.position.set(15, 0, 0);
@@ -33,9 +33,9 @@ export default function GalleryLighting() {
         target={sunTarget}
         color="#fff2dc"
         intensity={2.4}
-        castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        castShadow={!lowPower}
+        shadow-mapSize-width={lowPower ? 512 : 2048}
+        shadow-mapSize-height={lowPower ? 512 : 2048}
         shadow-camera-near={0.5}
         shadow-camera-far={100}
         shadow-camera-left={-34}

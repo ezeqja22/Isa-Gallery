@@ -20,6 +20,7 @@ type RoomModelProps = {
   onArtworkSelect?: (artwork: Artwork) => void;
 
   artworkInteractionEnabled?: boolean;
+  lowPower?: boolean;
 };
 
 type MaterialBackup = {
@@ -31,6 +32,7 @@ export default function RoomModel({
   position = [0, 0, 0],
   onArtworkSelect,
   artworkInteractionEnabled = true,
+  lowPower = false,
 }: RoomModelProps) {
   const { scene } = useGLTF("/models/room1.glb");
 
@@ -52,38 +54,48 @@ export default function RoomModel({
    */
   const materialBackups = useRef(new WeakMap<THREE.Material, MaterialBackup>());
 
-  /*
-   * IMPORTANT:
-   *
-   * Clone both the scene AND the materials.
-   *
-   * scene.clone(true) alone still shares the original
-   * materials from useGLTF's cached model.
-   *
-   * Since we're going to change emissive values on hover,
-   * we want completely independent materials.
-   */
-  const clonedScene = useMemo(() => {
+  // Only artwork materials need independent copies for hover highlighting.
+  // Other meshes share the GLTF cache's immutable materials and geometries.
+  const { clonedScene, ownedMaterials } = useMemo(() => {
     const clone = scene.clone(true);
+    const ownedMaterials = new Set<THREE.Material>();
+    const belongsToArtwork = (mesh: THREE.Object3D): boolean => {
+      let node: THREE.Object3D | null = mesh;
+      while (node) {
+        const name = node.name.replace(/\.\d{3}$/, "");
+        if (findArtworkByObjectName(name)) return true;
+        for (const artwork of Object.values(ARTWORKS)) {
+          for (const registeredName of artwork.objectNames) {
+            const base = registeredName.endsWith("_Art")
+              ? registeredName.slice(0, -4) : registeredName;
+            if (name.startsWith(`${registeredName}_Frame_`) ||
+                name.startsWith(`${base}_Frame_`)) return true;
+          }
+        }
+        node = node.parent;
+      }
+      return false;
+    };
 
     clone.traverse((child) => {
-      if (!(child instanceof THREE.Mesh)) {
-        return;
-      }
-
-      if (child.name.startsWith("NewSkylight_Ceiling")) {
-        child.material = Array.isArray(child.material)
-          ? child.material.map(ceilingMaterial)
-          : ceilingMaterial(child.material);
-      } else if (Array.isArray(child.material)) {
-        child.material = child.material.map((material) => material.clone());
-      } else if (child.material) {
-        child.material = child.material.clone();
-      }
+      if (!(child instanceof THREE.Mesh)) return;
+      const isCeiling = child.name.startsWith("NewSkylight_Ceiling");
+      if (!isCeiling && !belongsToArtwork(child)) return;
+      const makeMaterial = (material: THREE.Material) => {
+        const copy = isCeiling ? ceilingMaterial(material) : material.clone();
+        ownedMaterials.add(copy);
+        return copy;
+      };
+      child.material = Array.isArray(child.material)
+        ? child.material.map(makeMaterial)
+        : makeMaterial(child.material);
     });
-
-    return clone;
+    return { clonedScene: clone, ownedMaterials };
   }, [scene]);
+
+  useEffect(() => {
+    return () => { ownedMaterials.forEach((material) => material.dispose()); };
+  }, [ownedMaterials]);
 
   /*
    * -------------------------------------------------------
@@ -312,14 +324,14 @@ export default function RoomModel({
       if (isGlass) {
         child.castShadow = false;
 
-        child.receiveShadow = true;
+        child.receiveShadow = !lowPower;
       } else {
-        child.castShadow = true;
+        child.castShadow = !lowPower;
 
-        child.receiveShadow = true;
+        child.receiveShadow = !lowPower;
       }
     });
-  }, [clonedScene]);
+  }, [clonedScene, lowPower]);
 
   /*
    * Reset hover/cursor whenever artwork interaction
