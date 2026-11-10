@@ -236,3 +236,26 @@ button:focus-visible, a:focus-visible { outline: 2px solid #d8bd83; outline-offs
   .lightweight-gallery-header h1 { font-size: 28px; }
   .gallery-room-notice { bottom: max(95px, 16vh); font-size: 11px; }
 }
+
+/* Avoid duplicating the baked-in screenshot labels under the live introduction. */
+.gallery-intro-poster {
+  background-image:
+    linear-gradient(180deg, #171b16 0%, #171b16 8%, transparent 19%),
+    linear-gradient(90deg, #171b16 0%, #171b16 39%, rgba(23,27,22,.94) 48%, transparent 78%),
+    url("/images/hallway-welcome-web.png");
+  background-position: center, center, center;
+  background-size: cover;
+}
+.gallery-error-view { display: grid; place-items: center; padding: 30px; overflow-y: auto; }
+.gallery-error-message { width: min(720px, 100%); color: #e8e0cf; }
+.gallery-error-message h1 { font: 400 clamp(38px, 6vw, 66px) Georgia, serif; margin: 20px 0; }
+.gallery-error-detail { overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #d2b984; }
+.gallery-error-actions { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px; }
+@media(max-width:700px) {
+  .gallery-intro-poster {
+    background-image:
+      linear-gradient(180deg, #171b16 0%, #171b16 7%, transparent 18%),
+      linear-gradient(90deg, rgba(23,27,22,.9) 0%, rgba(23,27,22,.9) 58%, rgba(23,27,22,.32) 100%),
+      url("/images/hallway-welcome-web.png");
+  }
+}
