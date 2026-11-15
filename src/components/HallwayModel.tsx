@@ -50,18 +50,15 @@ export function SceneReady({ onReady }: { onReady: () => void }) {
     let cancelled = false;
     let firstFrame = 0;
     let secondFrame = 0;
-    const { gl, scene, camera, invalidate } = get();
-    const revealAfterPaint = () => {
-      if (cancelled) return;
-      invalidate();
-      firstFrame = requestAnimationFrame(() => {
-        secondFrame = requestAnimationFrame(() => {
-          if (!cancelled) onReady();
-        });
+    const { invalidate } = get();
+    // The core room has mounted. Do not block navigation on compileAsync for
+    // every shader in the entire house; Three.js compiles as frames are rendered.
+    invalidate();
+    firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        if (!cancelled) onReady();
       });
-    };
-    // Model loading is complete even on devices without async shader warmup.
-    gl.compileAsync(scene, camera).then(revealAfterPaint).catch(revealAfterPaint);
+    });
     return () => {
       cancelled = true;
       cancelAnimationFrame(firstFrame);

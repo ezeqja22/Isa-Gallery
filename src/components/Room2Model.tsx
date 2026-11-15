@@ -6,6 +6,7 @@ import * as THREE from "three";
 
 type Room2ModelProps = {
   position?: [number, number, number];
+  lowPower?: boolean;
 };
 
 function patchCeilingMaterial(sourceMaterial: THREE.Material): THREE.Material {
@@ -69,7 +70,7 @@ ${marker}
   return material;
 }
 
-export default function Room2Model({ position = [0, 0, 0] }: Room2ModelProps) {
+export default function Room2Model({ position = [0, 0, 0], lowPower = false }: Room2ModelProps) {
   const { scene } = useGLTF("/models/room2.glb");
 
   const clonedScene = useMemo(() => {
@@ -77,6 +78,7 @@ export default function Room2Model({ position = [0, 0, 0] }: Room2ModelProps) {
   }, [scene]);
 
   useEffect(() => {
+    const ownedMaterials = new Set<THREE.Material>();
     clonedScene.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) {
         return;
@@ -89,26 +91,28 @@ export default function Room2Model({ position = [0, 0, 0] }: Room2ModelProps) {
       if (isCeiling) {
         console.log("[Room2] Applying ceiling lighting fix:", child.name);
 
-        if (Array.isArray(child.material)) {
-          child.material = child.material.map((material) =>
-            patchCeilingMaterial(material),
-          );
-        } else {
-          child.material = patchCeilingMaterial(child.material);
-        }
+        const cloneCeiling = (material: THREE.Material) => {
+          const patched = lowPower ? material.clone() : patchCeilingMaterial(material);
+          ownedMaterials.add(patched);
+          return patched;
+        };
+        child.material = Array.isArray(child.material)
+          ? child.material.map(cloneCeiling)
+          : cloneCeiling(child.material);
 
         child.castShadow = false;
-        child.receiveShadow = true;
+        child.receiveShadow = !lowPower;
 
         return;
       }
 
-      child.castShadow = true;
-      child.receiveShadow = true;
+      child.castShadow = !lowPower;
+      child.receiveShadow = !lowPower;
     });
-  }, [clonedScene]);
+    return () => { ownedMaterials.forEach((material) => material.dispose()); };
+  }, [clonedScene, lowPower]);
 
   return <primitive object={clonedScene} position={position} />;
 }
 
-useGLTF.preload("/models/room2.glb");
+// Atelier loading is controlled by GalleryCanvas; never eagerly preload here.

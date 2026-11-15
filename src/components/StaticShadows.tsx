@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 
 /** Mount after the room models: only the camera moves in this scene. */
-export default function StaticShadows() {
+export default function StaticShadows({ revision = 0 }: { revision?: number }) {
   const get = useThree((state) => state.get);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function StaticShadows() {
       gl.shadowMap.autoUpdate = previous;
       gl.shadowMap.needsUpdate = true;
     };
-  }, [get]);
+  }, [get, revision]);
 
   return null;
 }
