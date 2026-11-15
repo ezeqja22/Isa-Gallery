@@ -49,3 +49,4 @@ scripts/__pycache__/
 *.blend1
 *.blend.reverted-*
 *.glb.reverted-*
+/.playwright-cli/
