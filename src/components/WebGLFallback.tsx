@@ -56,6 +56,7 @@ export default function WebGLFallback() {
         >
           Reload
         </button>
+        <button onClick={()=>{const url=new URL(window.location.href);url.searchParams.set('quality','low');window.location.assign(url)}} style={{padding:'10px 18px',marginLeft:12,cursor:'pointer'}}>Retry in Low quality</button>
       </div>
     </div>
   );

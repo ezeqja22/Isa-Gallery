@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { ThreeEvent, useThree } from "@react-three/fiber";
 
-import { useGLTF } from "@react-three/drei";
 
 import GalleryLabels from "@/components/GalleryLabels";
 import * as THREE from "three";
@@ -15,6 +14,7 @@ import { ceilingMaterial } from "./ceilingMaterial";
 import { ARTWORKS, Artwork, findArtworkByObjectName } from "@/config/artworks";
 
 type RoomModelProps = {
+  scene: THREE.Group;
   position?: [number, number, number];
 
   onArtworkSelect?: (artwork: Artwork) => void;
@@ -28,11 +28,11 @@ type MaterialBackup = {
 };
 
 export default function RoomModel({
+  scene,
   position = [0, 0, 0],
   onArtworkSelect,
   artworkInteractionEnabled = true,
 }: RoomModelProps) {
-  const { scene } = useGLTF("/models/room1.glb");
 
   /*
    * Gives us imperative access to the actual
@@ -84,6 +84,8 @@ export default function RoomModel({
 
     return clone;
   }, [scene]);
+
+  useEffect(()=>()=>{clonedScene.traverse(child=>{if(child instanceof THREE.Mesh){for(const material of Array.isArray(child.material)?child.material:[child.material])material.dispose();}});},[clonedScene]);
 
   /*
    * -------------------------------------------------------
@@ -454,7 +456,3 @@ export default function RoomModel({
     </group>
   );
 }
-
-useGLTF.preload("/models/room1.glb");
-
-

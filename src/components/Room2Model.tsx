@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { batchDecorations } from '@/lib/batchDecorations';
 
 type Room2ModelProps = {
+  scene: THREE.Group;
   position?: [number, number, number];
 };
 
@@ -69,11 +70,12 @@ ${marker}
   return material;
 }
 
-export default function Room2Model({ position = [0, 0, 0] }: Room2ModelProps) {
-  const { scene } = useGLTF("/models/room2.glb");
+export default function Room2Model({ scene, position = [0, 0, 0] }: Room2ModelProps) {
 
   const clonedScene = useMemo(() => {
-    return scene.clone(true);
+    const copy=scene.clone(true);
+    copy.userData.disposeBatches=batchDecorations(copy);
+    return copy;
   }, [scene]);
 
   useEffect(() => {
@@ -106,9 +108,8 @@ export default function Room2Model({ position = [0, 0, 0] }: Room2ModelProps) {
       child.castShadow = true;
       child.receiveShadow = true;
     });
+    return ()=>{clonedScene.userData.disposeBatches?.();clonedScene.traverse(child=>{if(child instanceof THREE.Mesh && child.name.startsWith('Room2_Ceiling')){for(const material of Array.isArray(child.material)?child.material:[child.material])material.dispose();}});};
   }, [clonedScene]);
 
-  return <primitive object={clonedScene} position={position} />;
+  return <group position={position}><primitive object={clonedScene} /></group>;
 }
-
-useGLTF.preload("/models/room2.glb");

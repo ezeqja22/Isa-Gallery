@@ -1,24 +1,26 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
-import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 
 type SkyBackgroundProps = {
   visible: boolean;
+  quality?:'high'|'balanced'|'low';
 };
 
-export default function SkyBackground({ visible }: SkyBackgroundProps) {
+export default function SkyBackground({ visible,quality='high' }: SkyBackgroundProps) {
   const sky = useRef<THREE.Mesh>(null);
   useFrame(({ camera }) => {
     // A distant sky has no parallax: never jump its centre when changing rooms.
     sky.current?.position.copy(camera.position);
   });
+  const url=quality==='high'?'/optimized/sky.hdr':`/optimized/sky-${quality}.hdr`;
   const loadedTexture = useLoader(
-    EXRLoader,
-    "/environment/drackenstein_quarry_puresky_4k.exr",
+    HDRLoader,
+    url,
   );
 
   const texture = useMemo(() => {
@@ -87,6 +89,7 @@ export default function SkyBackground({ visible }: SkyBackgroundProps) {
       `,
     });
   }, [texture]);
+  useEffect(()=>()=>{texture.dispose();material.dispose();loadedTexture.dispose();useLoader.clear(HDRLoader,url);},[texture,material,loadedTexture,url]);
 
   if (!visible) {
     return null;
