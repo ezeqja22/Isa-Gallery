@@ -231,13 +231,15 @@ export default function Home() {
       }}
     >
       <LoadingScreen ready={sceneReady} progress={progress} error={loadError} />
-      {sceneReady && (preparing || loadError) && (
-        <div className="visit-loading" role="status">
-          {loadError ||
-            `Preparing the next room · ${progress.loaded}/${progress.total || "…"} files`}
-          {loadError && (
-            <button onClick={() => window.location.reload()}>Retry</button>
-          )}
+      {sceneReady && preparing && !loadError && (
+        <div className="visit-progress" role="status" aria-label="Preparing the next room">
+          <span className="visit-spinner" aria-hidden="true" />
+        </div>
+      )}
+      {sceneReady && loadError && (
+        <div className="visit-error" role="alert">
+          <span>{loadError}</span>
+          <button type="button" onClick={() => window.location.reload()}>Retry</button>
         </div>
       )}
 
