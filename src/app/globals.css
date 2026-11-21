@@ -184,6 +184,49 @@ button:focus-visible, a:focus-visible { outline: 2px solid #d8bd83; outline-offs
 .experience-header--inspection { z-index:1200; pointer-events:none; }
 .experience-header--inspection .wordmark,.experience-header--inspection .header-location,.experience-header--inspection .menu-button { visibility:hidden; }
 .experience-header--inspection .sound-button { pointer-events:auto; }
- .visit-loading {position:fixed;left:50%;top:100px;transform:translateX(-50%);z-index:1100;padding:12px 20px;background:#292c21;color:#eee8d5;font-size:13px;max-width:90vw;text-align:center;}
- .visit-loading button {margin-left:12px;text-decoration:underline;}
+/* Quiet, non-blocking indication while a room loads. */
+.visit-progress {
+  position: fixed;
+  top: max(86px, calc(env(safe-area-inset-top) + 66px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.visit-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(184, 155, 103, .3);
+  border-top-color: #e8d5a9;
+  border-radius: 50%;
+  animation: visit-spinner-rotate .8s linear infinite;
+}
+@keyframes visit-spinner-rotate { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .visit-spinner { animation: none; }
+}
+/* Keep a usable retry message for genuine loading failures. */
+.visit-error {
+  position: fixed;
+  top: max(86px, calc(env(safe-area-inset-top) + 66px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  max-width: min(90vw, 420px);
+  padding: 12px 16px;
+  background: #292c21;
+  border: 1px solid #b89b6770;
+  color: #eee8d5;
+  font-size: 12px;
+  text-align: center;
+}
+.visit-error button {
+  margin-left: 12px;
+  color: #e8d5a9;
+  text-decoration: underline;
+}
  .explore-foot select {margin-left:12px;background:#292c21;color:#eee8d5;padding:7px;border:1px solid #8a8063;}
