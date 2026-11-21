@@ -1,11 +1,10 @@
 "use client";
 import GalleryIntroduction from "./GalleryIntroduction";
 import { useEffect, useMemo } from 'react';
-import { useGLTF } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ceilingMaterial } from './ceilingMaterial';
-export default function HallwayModel() {
+export default function HallwayModel({scene}:{scene:THREE.Group}) {
   const get = useThree(state => state.get);
   const size = useThree(state => state.size);
   useEffect(() => {
@@ -16,7 +15,6 @@ export default function HallwayModel() {
       invalidate();
     }
   }, [get, size.width, size.height]);
-  const { scene } = useGLTF('/models/hallway.glb');
   const model = useMemo(() => {
     const copy = scene.clone(true);
     copy.traverse((object) => {
@@ -33,6 +31,7 @@ export default function HallwayModel() {
     });
     return copy;
   }, [scene]);
+  useEffect(()=>()=>{model.traverse(object=>{if(object instanceof THREE.Mesh && object.name==='Hall_Ceiling'){for(const material of Array.isArray(object.material)?object.material:[object.material])material.dispose();}});},[model]);
 
   return <>
     <primitive object={model} />
@@ -44,7 +43,7 @@ export default function HallwayModel() {
 }
 
 // Mount inside the shared Suspense boundary, after every room has resolved.
-export function SceneReady({ onReady }: { onReady: () => void }) {
+export function SceneReady({ onReady,revision }: { onReady: () => void;revision:unknown }) {
   const get = useThree((state) => state.get);
   useEffect(() => {
     let cancelled = false;
@@ -67,7 +66,6 @@ export function SceneReady({ onReady }: { onReady: () => void }) {
       cancelAnimationFrame(firstFrame);
       cancelAnimationFrame(secondFrame);
     };
-  }, [get, onReady]);
+  }, [get, onReady,revision]);
   return null;
 }
-useGLTF.preload('/models/hallway.glb');

@@ -184,3 +184,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid #d8bd83; outline-offs
 .experience-header--inspection { z-index:1200; pointer-events:none; }
 .experience-header--inspection .wordmark,.experience-header--inspection .header-location,.experience-header--inspection .menu-button { visibility:hidden; }
 .experience-header--inspection .sound-button { pointer-events:auto; }
+ .visit-loading {position:fixed;left:50%;top:100px;transform:translateX(-50%);z-index:1100;padding:12px 20px;background:#292c21;color:#eee8d5;font-size:13px;max-width:90vw;text-align:center;}
+ .visit-loading button {margin-left:12px;text-decoration:underline;}
+ .explore-foot select {margin-left:12px;background:#292c21;color:#eee8d5;padding:7px;border:1px solid #8a8063;}

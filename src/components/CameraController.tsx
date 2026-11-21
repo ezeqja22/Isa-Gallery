@@ -267,7 +267,7 @@ export default function CameraController({
      * Skip the cinematic route entirely and move directly
      * to the destination.
      */
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || fromView === view) {
       camera.position.set(
         nextView.position.x,
         nextView.position.y,

@@ -5,8 +5,10 @@ import { useProgress } from "@react-three/drei";
 import type { GalleryView, RoomView } from "@/config/gallery";
 import { ARTWORKS, type Artwork } from "@/config/artworks";
 import { EXPERIENCE as copy } from "@/config/experience";
+import type {Quality} from '@/lib/galleryAssets';
 
-export default function ExperienceShell({ view, transitioning, inspecting, onEnter, onHome, onArtwork }: {
+export default function ExperienceShell({ view, transitioning, inspecting, onEnter, onHome, onArtwork,quality,onQuality }: {
+  quality:Quality;onQuality:(quality:Quality)=>void;
   view: GalleryView; transitioning: boolean; inspecting: boolean;
   onEnter: (room: RoomView) => void; onHome: () => void; onArtwork: (art: Artwork) => void;
 }) {
@@ -53,7 +55,7 @@ export default function ExperienceShell({ view, transitioning, inspecting, onEnt
         </div>
       </div>
         <nav aria-label="Explore the house"><button onClick={() => navigate("room1")} disabled={active}><span>01</span><strong>{copy.galleryTitle}</strong><small>Finished works, a closer look.</small><b aria-hidden="true">↗</b></button><button onClick={() => navigate("room2")} disabled={active}><span>02</span><strong>{copy.studioTitle}</strong><small>The space behind the paintings.</small><b aria-hidden="true">↗</b></button><button className="return-intro" onClick={() => navigate("overview")}>Return to the introduction <span aria-hidden="true">↗</span></button></nav>
-      </div><div className="explore-foot">Two rooms. One unfolding story.</div>
+      </div><div className="explore-foot"><label>Visual quality · restarts your visit <select value={quality} disabled={transitioning} onChange={event=>onQuality(event.target.value as Quality)}><option value="high">High</option><option value="balanced">Balanced</option><option value="low">Low</option></select></label><span>Two rooms. One unfolding story.</span></div>
     </dialog>
   </div>;
 }

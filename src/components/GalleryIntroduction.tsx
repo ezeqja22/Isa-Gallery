@@ -13,6 +13,8 @@ export default function GalleryIntroduction() {
     ctx.fillStyle = '#3c3529'; ctx.font = '27px Georgia';
     GALLERY_INTRO.lines.forEach((line,i) => ctx.fillText(line,70,230+i*54));
     const map = new THREE.CanvasTexture(canvas); map.colorSpace = THREE.SRGBColorSpace;
+    // This effect owns a browser canvas texture; publishing it requires one render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTexture(map); return () => map.dispose();
   }, []);
   if (!texture) return null;

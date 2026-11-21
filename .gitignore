@@ -50,3 +50,4 @@ scripts/__pycache__/
 *.blend.reverted-*
 *.glb.reverted-*
 /.playwright-cli/
+/.next-performance/
