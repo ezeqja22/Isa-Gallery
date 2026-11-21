@@ -48,3 +48,20 @@ No deletion is approved by inference. Original `.blend` files and unique source
 assets stay in place. Before any cleanup, list each candidate's exact path, size,
 runtime/source reference evidence and recovery location here. Uncertain files stay.
 The anniversary video and its source material are user deliverables, not junk.
+
+### Reviewed cleanup candidates (before action)
+
+| Exact path | Bytes | Evidence / recovery |
+|---|---:|---|
+| `public/file.svg` | 391 | Unused Next starter icon; no source/config/script references. Recover from baseline Git commit. |
+| `public/globe.svg` | 1,035 | Same evidence. |
+| `public/next.svg` | 1,375 | Same evidence. |
+| `public/vercel.svg` | 128 | Same evidence. |
+| `public/window.svg` | 385 | Same evidence. |
+| `public/optimized/texture-9d8cab867678b6499925.webp` | 15,809,828 | Generated in this task; replaced by the smaller original JPEG. No generated glTF references it. Move to `reports/performance/intermediate/` rather than delete. |
+
+All paths are within the Gallery project. The Blender audit confirms the source
+materials use their named texture images, not these starter SVGs. Original GLBs
+and the EXR are retained as reproducible pipeline inputs. Ignored `.blend` backups,
+textures and earlier deliverables remain untouched because their unique source
+value cannot be disproved by runtime references alone.

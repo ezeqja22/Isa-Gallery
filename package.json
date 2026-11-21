@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint src",
+    "assets:optimize": "node scripts/optimize-gallery.mjs",
+    "assets:verify": "node scripts/verify-optimized-assets.mjs",
+    "audit:assets": "node scripts/performance-audit.cjs",
+    "audit:browser": "node scripts/performance-browser.cjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
@@ -20,12 +24,16 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
